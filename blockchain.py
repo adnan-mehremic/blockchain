@@ -1,8 +1,9 @@
-# Create blockchain
+# Blockchain
 
 import datetime
 import hashlib
 import json
+from flask import Flask, jsonify
 
 
 class Blockchain:
@@ -54,5 +55,26 @@ class Blockchain:
             previous_block = block
             block_index += 1
         return True
-        
     
+        
+# Web App
+app = Flask(__name__)
+        
+# Creating blockchain
+blockchain = Blockchain()
+
+@app.route('http://127.0.0.1:5000/mine_block', methods=['GET'])
+
+def mine_block():
+    previous_block = blockchain.get_previous_block()
+    previous_proof = previous_block['proof']
+    proof = blockchain.proof_of_work(previous_proof)
+    previous_hash = blockchain.hash(previous_block)
+    block = blockchain.create_block(proof, previous_hash)
+    response = {'message':'',
+                'index':block['index'],
+                'timestamp':block['timestamp'],
+                'proof': block['proof'],
+                'previous_hash': block['previous_hash']}
+    
+    return jsonify(response),  200
